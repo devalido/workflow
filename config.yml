@@ -1,0 +1,20 @@
+yaml
+
+baseURL: "https://devalido.github.io/workflow/"
+languageCode: "fr-FR"
+title: "La dévalidothèque en ligne"
+theme: "papermod"   # supprimez ou changez si vous n'utilisez pas de thème
+enableRobotsTXT: true
+paginate: 10
+
+params:
+  description: "Lectures crips et dévalidistes"
+  author: ""
+
+# optional: permalinks (exemples)
+permalinks:
+  post: "/:year/:month/:slug/"
+
+# optional: build options
+minify:
+  minifyOutput: true

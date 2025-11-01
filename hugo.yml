@@ -1,0 +1,69 @@
+yaml
+
+name: Build and deploy Hugo site to gh-pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: '0.116.0' # ajustez vers la version souhaitée, ou 'latest'
+
+      - name: Install Node (optional, for some themes/assets)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Cache Hugo modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/hugo
+            resources/_gen
+          key: ${{ runner.os }}-hugo-${{ hashFiles('**/*.mod','**/go.sum') }}
+
+      - name: Build site
+        run: |
+          hugo --minify
+
+      - name: Upload artifact (for debug)
+        uses: actions/upload-artifact@v4
+        with:
+          name: public
+          path: public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: public
+          path: public
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          publish_branch: gh-pages
+          keep_files: false
